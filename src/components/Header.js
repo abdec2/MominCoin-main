@@ -29,10 +29,11 @@ const HeaderComponent = ({setError, setErrMsg}) => {
         console.log(ethers.utils.formatUnits(balanceOf, CONFIG.TOKEN_DECIMAL));
     }
 
-    const getNativeBalance = async (provider, address) => {
-        const nativeBalance = await provider.getBalance(address)
-        updateBNBBalance(parseFloat(ethers.utils.formatEther(nativeBalance)).toFixed(4))
-        console.log(parseFloat(ethers.utils.formatEther(nativeBalance)).toFixed(4))
+    const getNativeBalance = async (signer, address) => {
+        const tokenContract = new ethers.Contract(CONFIG.USDT_ADDRESS, tokenABI, signer)
+        const balanceOf = await tokenContract.balanceOf(address) 
+        updateBNBBalance(parseFloat(ethers.utils.formatEther(balanceOf)).toFixed(4))
+        console.log(parseFloat(ethers.utils.formatEther(balanceOf)).toFixed(4))
     }
 
     const connectWallet = async () => {
@@ -53,14 +54,15 @@ const HeaderComponent = ({setError, setErrMsg}) => {
             setError(false) 
             setErrMsg('')
             getTokenBalance(signer, address)
-            getNativeBalance(provider, address)
+            getNativeBalance(signer, address)
         }
         
     }
     useEffect(()=>{
         if(window.ethereum) {
             window.ethereum.on('accountsChanged', accounts => {
-                addAccount({ id: accounts[0] })
+                // addAccount({ id: accounts[0] })
+                connectWallet()
             })
             window.ethereum.on('chainChanged', chainId => {
                 window.location.reload();

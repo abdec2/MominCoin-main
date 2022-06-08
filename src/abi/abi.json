@@ -1,5 +1,23 @@
 [
 	{
+	  "constant": false,
+	  "inputs": [
+		{
+		  "name": "beneficiary",
+		  "type": "address"
+		},
+		{
+		  "name": "_weiAmount",
+		  "type": "uint256"
+		}
+	  ],
+	  "name": "buyTokens",
+	  "outputs": [],
+	  "payable": false,
+	  "stateMutability": "nonpayable",
+	  "type": "function"
+	},
+	{
 	  "constant": true,
 	  "inputs": [],
 	  "name": "rate",
@@ -44,20 +62,6 @@
 	{
 	  "constant": true,
 	  "inputs": [],
-	  "name": "getLatestPrice",
-	  "outputs": [
-		{
-		  "name": "",
-		  "type": "int256"
-		}
-	  ],
-	  "payable": false,
-	  "stateMutability": "view",
-	  "type": "function"
-	},
-	{
-	  "constant": true,
-	  "inputs": [],
 	  "name": "remainingTokens",
 	  "outputs": [
 		{
@@ -81,20 +85,6 @@
 	  ],
 	  "payable": false,
 	  "stateMutability": "view",
-	  "type": "function"
-	},
-	{
-	  "constant": false,
-	  "inputs": [
-		{
-		  "name": "beneficiary",
-		  "type": "address"
-		}
-	  ],
-	  "name": "buyTokens",
-	  "outputs": [],
-	  "payable": true,
-	  "stateMutability": "payable",
 	  "type": "function"
 	},
 	{
@@ -130,12 +120,8 @@
 		  "type": "address"
 		},
 		{
-		  "name": "_minPurchase",
-		  "type": "uint256"
-		},
-		{
-		  "name": "_decimals",
-		  "type": "uint256"
+		  "name": "_USDT",
+		  "type": "address"
 		}
 	  ],
 	  "payable": false,

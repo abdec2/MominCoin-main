@@ -5,6 +5,7 @@ import { GlobalContext } from '../context/GlobalContext';
 import CONFIG from './../abi/config.json';
 
 import CROWDSALE_ABI from './../abi/abi.json';
+import tokenAbi from './../abi/token.json';
 const crowdsaleAddress = CONFIG.ICO_CONTRACT_ADDRESS;
 
 function Presale() {
@@ -44,9 +45,9 @@ function Presale() {
         }
     }
 
-    const buyToken = async (e) => {
+    const approveUSDT = async (e) => {
+        e.preventDefault();
         try {
-            e.preventDefault();
             if (!window.ethereum) {
                 alert('Please install MetaMask');
                 return
@@ -60,17 +61,28 @@ function Presale() {
             const instance = await web3modal.connect();
             const provider = new ethers.providers.Web3Provider(instance);
             const signer = provider.getSigner();
-            const contract = new ethers.Contract(crowdsaleAddress, CROWDSALE_ABI, signer);
+            const usdtContract = new ethers.Contract(CONFIG.USDT_ADDRESS, tokenAbi, signer);
             const price = ethers.utils.parseEther(ethPrice.current.value);
-            const balance = ethers.utils.formatEther(await provider.getBalance(signer.getAddress()));
+            const transaction = await usdtContract.approve(CONFIG.ICO_CONTRACT_ADDRESS, price, {from: account});
+            await transaction.wait();
+            buyToken(price, signer);
+        } catch (e) {
+            setLoading(false);
+        }
+        
+    }
 
-            if (balance < ethPrice.current.value) {
+    const buyToken = async (price, signer) => {
+        try {
+            const contract = new ethers.Contract(crowdsaleAddress, CROWDSALE_ABI, signer);
+            
+            if (bnbBalance < ethPrice.current.value) {
                 setLoading(false);
                 alert('Insufficient Balance');
                 return;
             }
 
-            const transaction = await contract.buyTokens(account, { value: price.toString() });
+            const transaction = await contract.buyTokens(account, price.toString());
             await transaction.wait();
 
             setLoading(false);
@@ -89,30 +101,30 @@ function Presale() {
                 {/* <div className='mt-3 hidden md:block'>
                 <p className="text-lg">For Progress, Investment & Success</p>
             </div> */}
-                <div className='mt-10 text-left'>
+                {/* <div className='mt-10 text-left'>
                     <h3 className=' uppercase text-sm font-semibold mb-2 text-[#33FF68]'>Instructions:</h3>
                     <ul className='text-sm list-outside list-disc'>
                         <li className='ml-4'>Minimum purchase allowed: 0.01 BNB</li>
                         <li className='ml-4'>Purchase amount should be multiple of minimum purchase</li>
                     </ul>
-                </div>
+                </div> */}
             </div>
             <div className="my-10 border p-10 rounded-xl border-white border-opacity-30  ">
                 {account && (
                     <>
-                        <p className='text-sm'>BNB Balance: {bnbBalance}</p>
+                        <p className='text-sm'>USDT Balance: {bnbBalance}</p>
                         <p className='text-sm'>Your Momin Balance: {tokenBalance} </p>
                     </>
                 )}
-                <form onSubmit={buyToken}>
+                <form onSubmit={approveUSDT}>
                     <div className="my-3">
-                        <label className="text-base font-bold text-[#33FF68]">Amount BNB</label>
+                        <label className="text-base font-bold text-[#33FF68]">Amount USDT</label>
                         <input ref={ethPrice} type="text" className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 bg-white bg-opacity-30 border" required />
 
                     </div>
                     <div className="my-3">
                         <label className="text-base font-bold text-[#33FF68]">Rate</label>
-                        <input className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 border" type="text" value="$0.01" disabled />
+                        <input className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 border" type="text" value="0.0000000001 USDT" disabled />
                     </div>
 
                     <div className="mt-10">
