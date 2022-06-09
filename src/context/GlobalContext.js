@@ -4,7 +4,8 @@ import { AppReducer } from './AppReducer'
 const initialState = {
     account: null, 
     bnbBalance: null, 
-    tokenBalance: null
+    tokenBalance: null, 
+    rate: null
 }
 
 export const GlobalContext = createContext(initialState)
@@ -39,6 +40,13 @@ export const GlobalProvider = ({ children }) => {
         })
     }
 
+    const updateRate = (rate) => {
+        dispatch({
+            type: 'UPDATE_ICO_RATE',
+            payload: rate
+        })
+    }
+
     return (
         <GlobalContext.Provider value={
             {
@@ -48,7 +56,8 @@ export const GlobalProvider = ({ children }) => {
                 delAccount, 
                 addAccount,
                 updateTokenBalance,
-                updateBNBBalance
+                updateBNBBalance,
+                updateRate
             }
         }
         >

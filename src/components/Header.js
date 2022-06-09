@@ -2,9 +2,10 @@ import { ethers } from "ethers";
 import { useContext, useEffect } from "react";
 import Web3Modal from 'web3modal';
 import { GlobalContext } from "../context/GlobalContext";
-import logo from './../assets/logo5121.jpg';
+import logo from './../assets/logo.jpg';
 import CONFIG from './../abi/config.json'
 import tokenABI from './../abi/token.json'
+import icoAbi from './../abi/abi.json'
 import WalletConnectProvider from "@walletconnect/web3-provider";
 
 const providerOptions = {
@@ -20,13 +21,20 @@ const providerOptions = {
 
 const HeaderComponent = ({setError, setErrMsg}) => {
 
-    const { account, addAccount, delAccount, updateTokenBalance, updateBNBBalance } = useContext(GlobalContext);
+    const { account, addAccount, delAccount, updateTokenBalance, updateBNBBalance, updateRate } = useContext(GlobalContext);
 
     const getTokenBalance = async(signer, address) => {
         const tokenContract = new ethers.Contract(CONFIG.TOKEN_CONTRACT, tokenABI, signer)
         const balanceOf = await tokenContract.balanceOf(address) 
         updateTokenBalance(ethers.utils.formatUnits(balanceOf, CONFIG.TOKEN_DECIMAL))
         console.log(ethers.utils.formatUnits(balanceOf, CONFIG.TOKEN_DECIMAL));
+    }
+
+    const getICORate = async(signer) => {
+        const contract = new ethers.Contract(CONFIG.ICO_CONTRACT_ADDRESS, icoAbi, signer)
+        const rate = await contract.rate() 
+        updateRate(rate.toString())
+        console.log(rate.toString());
     }
 
     const getNativeBalance = async (signer, address) => {
@@ -55,6 +63,7 @@ const HeaderComponent = ({setError, setErrMsg}) => {
             setErrMsg('')
             getTokenBalance(signer, address)
             getNativeBalance(signer, address)
+            getICORate(signer)
         }
         
     }

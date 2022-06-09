@@ -22,6 +22,12 @@ export const AppReducer = (state, action) => {
                 ...state,
                 tokenBalance: action.payload
             }
+
+        case 'UPDATE_ICO_RATE':
+            return {
+                ...state,
+                rate: action.payload
+            }
         default:
             return state;
     };

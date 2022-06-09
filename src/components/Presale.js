@@ -6,11 +6,13 @@ import CONFIG from './../abi/config.json';
 
 import CROWDSALE_ABI from './../abi/abi.json';
 import tokenAbi from './../abi/token.json';
+import { parse } from 'url';
 const crowdsaleAddress = CONFIG.ICO_CONTRACT_ADDRESS;
 
 function Presale() {
     const { account, tokenBalance, bnbBalance } = useContext(GlobalContext);
     const [loading, setLoading] = useState(false);
+    const [recQty, setRecQty] = useState(0);
 
     const ethPrice = useRef(null);
 
@@ -45,6 +47,13 @@ function Presale() {
         }
     }
 
+    const validatePrice = () => {
+        if(parseInt(ethPrice.current.value) >= 5) {
+            return true;    
+        }
+        return false;
+    }
+
     const approveUSDT = async (e) => {
         e.preventDefault();
         try {
@@ -56,6 +65,11 @@ function Presale() {
                 alert('Please connnect wallet');
                 return;
             }
+            if(!validatePrice()) {
+                alert('Purchase should be made minimum 5 USDT');
+                return;
+            }
+
             setLoading(true);
             const web3modal = new Web3Modal();
             const instance = await web3modal.connect();
@@ -92,6 +106,10 @@ function Presale() {
         }
     }
 
+    const calReceivedToken = () => {
+        setRecQty(parseInt(ethPrice.current.value) / parseFloat(CONFIG.RATE))
+    }
+
     return (
         <div className="my-11 p-7 flex items-center flex-col md:flex-row justify-between border border-white border-opacity-20 rounded-3xl shadow-xl ">
             <div className="md:pl-8 text-center md:text-left md:mr-2">
@@ -101,13 +119,13 @@ function Presale() {
                 {/* <div className='mt-3 hidden md:block'>
                 <p className="text-lg">For Progress, Investment & Success</p>
             </div> */}
-                {/* <div className='mt-10 text-left'>
+                <div className='mt-10 text-left'>
                     <h3 className=' uppercase text-sm font-semibold mb-2 text-[#33FF68]'>Instructions:</h3>
                     <ul className='text-sm list-outside list-disc'>
-                        <li className='ml-4'>Minimum purchase allowed: 0.01 BNB</li>
-                        <li className='ml-4'>Purchase amount should be multiple of minimum purchase</li>
+                        <li className='ml-4'>Minimum purchase allowed: 5 USDT</li>
+                        {/* <li className='ml-4'>Purchase amount should be multiple of minimum purchase</li> */}
                     </ul>
-                </div> */}
+                </div>
             </div>
             <div className="my-10 border p-10 rounded-xl border-white border-opacity-30  ">
                 {account && (
@@ -119,12 +137,13 @@ function Presale() {
                 <form onSubmit={approveUSDT}>
                     <div className="my-3">
                         <label className="text-base font-bold text-[#33FF68]">Amount USDT</label>
-                        <input ref={ethPrice} type="text" className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 bg-white bg-opacity-30 border" required />
+                        <input ref={ethPrice} type="text" className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 bg-white bg-opacity-30 border" required onChange={calReceivedToken} />
+                        <small>You will receive: {((recQty) ? recQty : 0) + ' ' + CONFIG.TOKEN_SYMBOL}</small>
 
                     </div>
                     <div className="my-3">
                         <label className="text-base font-bold text-[#33FF68]">Rate</label>
-                        <input className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 border" type="text" value="0.0000000001 USDT" disabled />
+                        <input className="w-full h-12 rounded-lg p-2 text-xl focus:outline-none mt-1 border" type="text" value={CONFIG.RATE + " USDT" } disabled />
                     </div>
 
                     <div className="mt-10">
