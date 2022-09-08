@@ -12,7 +12,9 @@ const providerOptions = {
   walletconnect: {
     package: WalletConnectProvider, // required
     options: {
-      infuraId: process.env.REACT_APP_INFURA_PROJECT_ID // required
+      rpc: {
+        56: "https://bsc-dataseed1.binance.org/"
+      }
     }
   }
 };
@@ -21,7 +23,7 @@ const providerOptions = {
 
 const HeaderComponent = ({setError, setErrMsg}) => {
 
-    const { account, addAccount, delAccount, updateTokenBalance, updateBNBBalance, updateRate } = useContext(GlobalContext);
+    const { account, addAccount, delAccount, updateTokenBalance, updateBNBBalance, updateRate, updateProvider } = useContext(GlobalContext);
 
     const getTokenBalance = async(signer, address) => {
         const tokenContract = new ethers.Contract(CONFIG.TOKEN_CONTRACT, tokenABI, signer)
@@ -50,6 +52,8 @@ const HeaderComponent = ({setError, setErrMsg}) => {
         });
         const instance = await web3modal.connect();
         const provider = new ethers.providers.Web3Provider(instance);
+        console.log(provider)
+        updateProvider(provider)
         const signer = provider.getSigner();
         const address = await signer.getAddress();
         addAccount({ id: address });
@@ -93,7 +97,10 @@ const HeaderComponent = ({setError, setErrMsg}) => {
                             className="px-6 py-2 bg-[#33FF68] hover:bg-yellow-300 rounded text-black">
                             {account.slice(0, 5) + '...' + account.slice(38, 42)}
                         </a>
-                        <button className="text-xs text-right hover:text-yellow-500" onClick={() => delAccount()}>Disconnect</button>
+                        <button className="text-xs text-right hover:text-yellow-500" onClick={() => {
+                            delAccount()
+                            updateProvider(null)
+                        }}>Disconnect</button>
                     </div>
                 ) : (
                     <button className="px-6 py-2 bg-[#33FF68] hover:bg-yellow-300 rounded text-black font-bold" onClick={() => connectWallet()}>Connect Wallet</button>

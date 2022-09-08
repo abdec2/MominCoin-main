@@ -10,10 +10,10 @@ import { parse } from 'url';
 const crowdsaleAddress = CONFIG.ICO_CONTRACT_ADDRESS;
 
 function Presale() {
-    const { account, tokenBalance, bnbBalance } = useContext(GlobalContext);
+    const { account, tokenBalance, bnbBalance, provider } = useContext(GlobalContext);
     const [loading, setLoading] = useState(false);
     const [recQty, setRecQty] = useState(0);
-
+    console.log(provider)
     const ethPrice = useRef(null);
 
     const addToken = async () => {
@@ -71,9 +71,6 @@ function Presale() {
             }
 
             setLoading(true);
-            const web3modal = new Web3Modal();
-            const instance = await web3modal.connect();
-            const provider = new ethers.providers.Web3Provider(instance);
             const signer = provider.getSigner();
             const usdtContract = new ethers.Contract(CONFIG.USDT_ADDRESS, tokenAbi, signer);
             const price = ethers.utils.parseEther(ethPrice.current.value);

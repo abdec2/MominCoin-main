@@ -28,6 +28,12 @@ export const AppReducer = (state, action) => {
                 ...state,
                 rate: action.payload
             }
+
+        case 'UPDATE_PROVIDER':
+            return {
+                ...state,
+                provider: action.payload
+            }
         default:
             return state;
     };

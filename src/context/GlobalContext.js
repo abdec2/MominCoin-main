@@ -5,7 +5,8 @@ const initialState = {
     account: null, 
     bnbBalance: null, 
     tokenBalance: null, 
-    rate: null
+    rate: null, 
+    provider: null
 }
 
 export const GlobalContext = createContext(initialState)
@@ -47,17 +48,26 @@ export const GlobalProvider = ({ children }) => {
         })
     }
 
+    const updateProvider = (provider) => {
+        dispatch({
+            type: 'UPDATE_PROVIDER',
+            payload: provider
+        })
+    }
+
     return (
         <GlobalContext.Provider value={
             {
                 account: state.account, 
                 bnbBalance: state.bnbBalance,
                 tokenBalance: state.tokenBalance,
+                provider: state.provider,
                 delAccount, 
                 addAccount,
                 updateTokenBalance,
                 updateBNBBalance,
-                updateRate
+                updateRate,
+                updateProvider
             }
         }
         >
